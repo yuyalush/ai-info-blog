@@ -1,0 +1,25 @@
+{{ define "main" }}
+<div class="page-header">
+  <h1>{{ .Title }}</h1>
+</div>
+
+<div class="post-list">
+  {{ range .Pages.ByDate.Reverse }}
+  <article class="post-card">
+    <div class="post-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+      {{ range .Params.tags }}
+      <a href="{{ "/tags/" | relURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
+      {{ end }}
+    </div>
+    <h2 class="post-title"><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
+    {{ if .Summary }}
+    <p class="post-excerpt">{{ .Summary | plainify | truncate 120 }}</p>
+    {{ end }}
+    <a href="{{ .Permalink }}" class="read-more">続きを読む →</a>
+  </article>
+  {{ else }}
+  <p class="no-posts">記事がありません。</p>
+  {{ end }}
+</div>
+{{ end }}

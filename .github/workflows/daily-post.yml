@@ -1,0 +1,100 @@
+name: Daily AI News Post
+
+on:
+  schedule:
+    # 毎日 00:00 UTC (= 09:00 JST) に実行
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '既存の記事を上書きするか (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # ---------------------------------------------------------------
+      # 1. チェックアウト
+      # ---------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # 2. Python セットアップ & 記事生成
+      # ---------------------------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Generate daily AI news post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/generate_post.py
+
+      # ---------------------------------------------------------------
+      # 3. 新しい記事を main ブランチへコミット & プッシュ
+      # ---------------------------------------------------------------
+      - name: Commit new post to main
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add site/content/posts/
+          if git diff --staged --quiet; then
+            echo "No new post to commit (already exists or generation skipped)."
+          else
+            git commit -m "chore: add daily AI news post $(date +%Y-%m-%d) [skip ci]"
+            git push
+          fi
+
+      # ---------------------------------------------------------------
+      # 4. Hugo ビルド
+      # ---------------------------------------------------------------
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: false
+
+      - name: Build Hugo site
+        run: |
+          hugo \
+            --source site \
+            --destination ${{ github.workspace }}/public \
+            --minify \
+            --baseURL "https://yuyalush.github.io/ai-info-blog/"
+
+      # ---------------------------------------------------------------
+      # 5. GitHub Pages へデプロイ
+      # ---------------------------------------------------------------
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

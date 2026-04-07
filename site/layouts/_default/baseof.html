@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    {{- if .IsHome -}}{{ .Site.Title }}
+    {{- else -}}{{ .Title }} | {{ .Site.Title }}
+    {{- end -}}
+  </title>
+  <meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}" />
+  {{ range .AlternativeOutputFormats -}}
+    {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
+  {{ end }}
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="{{ "/" | relURL }}" class="site-title">🤖 {{ .Site.Title }}</a>
+      <nav>
+        <a href="{{ "/" | relURL }}">ホーム</a>
+        <a href="{{ "/tags/" | relURL }}">タグ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {{- block "main" . }}{{- end }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© {{ now.Year }} AI Info Blog — Powered by <a href="https://www.anthropic.com" target="_blank" rel="noopener">Claude</a> + <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a></p>
+    </div>
+  </footer>
+</body>
+</html>

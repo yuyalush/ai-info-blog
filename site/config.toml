@@ -1,0 +1,24 @@
+baseURL = "https://yuyalush.github.io/ai-info-blog/"
+languageCode = "ja-jp"
+defaultContentLanguage = "ja"
+title = "AI Info Blog"
+enableRobotsTXT = true
+enableEmoji = true
+
+[params]
+  description = "GitHub Copilot・Claude・ChatGPTなど、AI開発ツールとLLMの最新情報をお届け"
+  author = "AI Info Blog"
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  style = "github"
+
+[taxonomies]
+  tag = "tags"
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+  page = ["HTML"]
