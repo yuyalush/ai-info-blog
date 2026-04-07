@@ -64,6 +64,7 @@ jobs:
             echo "No new post to commit (already exists or generation skipped)."
           else
             git commit -m "chore: add daily AI news post $(date +%Y-%m-%d) [skip ci]"
+            git pull --rebase origin main
             git push
           fi
 
