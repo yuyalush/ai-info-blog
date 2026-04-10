@@ -20,10 +20,10 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="{{ "/" | relURL }}" class="site-title">🤖 {{ .Site.Title }}</a>
+      <a href="{{ .Site.Home.RelPermalink }}" class="site-title">🤖 {{ .Site.Title }}</a>
       <nav>
-        <a href="{{ "/" | relURL }}">ホーム</a>
-        <a href="{{ "/tags/" | relURL }}">タグ</a>
+        <a href="{{ .Site.Home.RelPermalink }}">ホーム</a>
+        <a href="{{ "tags/" | relURL }}">タグ</a>
       </nav>
     </div>
   </header>
